@@ -1,5 +1,6 @@
 package datastructure.tree;
 
+import common.Node;
 import common.TreeNode;
 
 import java.util.ArrayList;
@@ -84,6 +85,82 @@ public class BinaryTree {
 
         root.left=buildTree(inorderLeft,postorderLetf);
         root.right=buildTree(inorderRight,postorderRight);
+        return root;
+    }
+    //从前序与中序遍历序列构造二叉树
+    public TreeNode buildTree2(int[] preorder, int[] inorder) {
+        if(preorder == null || inorder == null || preorder.length==0){
+            return null;
+        }
+        return build(preorder,0,preorder.length-1,inorder,0,inorder.length-1);
+    }
+    public TreeNode build(int[] preorder, int preLeft,int preRight,int[] inorder,int inLeft,int inRight){
+        if (inLeft > inRight || preLeft >preRight) {
+            return null;
+        }
+        int rootValue=preorder[preLeft];
+        TreeNode root=new TreeNode(rootValue);
+        if(preLeft==preRight){
+            return root;
+        }
+        int rootIndex=-1;
+        for(int i=inLeft;i<=inRight;i++){
+            if(inorder[i]==rootValue){
+                rootIndex=i;
+            }
+        }
+        //左子树的长度
+        int leftLength=rootIndex-inLeft;
+        //前序序列中左子树的最后一个节点
+        int leftPreEnd = preLeft + leftLength;
+        root.left=build(preorder,preLeft+1,leftPreEnd,inorder,inLeft,rootIndex-1);
+        root.right=build(preorder,leftPreEnd+1,preRight,inorder,rootIndex+1,inRight);
+        return root;
+    }
+    //填充每个节点的下一个右侧节点指针
+    //给定一个完美二叉树，其所有叶子节点都在同一层，每个父节点都有两个子节点
+    public Node connect(Node root) {
+        if(root==null){
+            return null;
+        }
+        if(root.left!=null){
+            //完美二叉树，所以有左孩子必定有右孩子
+            root.left.next=root.right;
+            if(root.next!=null){
+                root.right.next=root.next.left;
+            }
+        }
+        connect(root.left);
+        connect(root.right);
+        return root;
+    }
+    //填充每个节点的下一个右侧节点指针 II
+    //填充它的每个 next 指针，让这个指针指向其下一个右侧节点。如果找不到下一个右侧节点，则将 next 指针设置为 NULL。
+    public Node connect2(Node root) {
+        if(root==null){
+            return null;
+        }
+        Node rootNextFirstChildNode=null;
+        Node p=root.next;
+        //找到root的兄弟节点中从左往右第一个不为空的孩子节点。
+        while(p!=null){
+            if(p.left!=null){
+                rootNextFirstChildNode=p.left;
+                break;
+            }else if(p.right!=null){
+                rootNextFirstChildNode=p.right;
+                break;
+            }
+            p=p.next;
+        }
+        if(root.left!=null){
+            root.left.next=root.right==null?rootNextFirstChildNode:root.right;
+        }
+        if(root.right!=null){
+            root.right.next=rootNextFirstChildNode;
+        }
+        connect2(root.right);
+        connect2(root.left);
         return root;
     }
 }
