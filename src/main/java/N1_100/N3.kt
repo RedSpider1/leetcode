@@ -4,7 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlin.math.max
 
-class Solution {
+class N3 {
     fun lengthOfLongestSubstring(s: String): Int {
         var maxLength = 0
         val n = s.length
