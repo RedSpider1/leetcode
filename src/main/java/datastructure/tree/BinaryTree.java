@@ -4,6 +4,8 @@ import common.Node;
 import common.TreeNode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class BinaryTree {
@@ -162,6 +164,85 @@ public class BinaryTree {
         connect2(root.right);
         connect2(root.left);
         return root;
+    }
+    public static String serialize(TreeNode root) {
+        List<Integer> result=new ArrayList<>();
+        LinkedList<TreeNode> queue=new LinkedList<>();
+        List<Integer> temp=new ArrayList<>();
+        if(root==null){
+            return result.toString();
+        }
+        queue.offer(root);
+        boolean flag=true;
+        while(!queue.isEmpty()&&flag){
+            flag=false;
+            result.addAll(temp);
+            temp.clear();
+            int n=queue.size();
+            for(int i=0;i<n;i++){
+                TreeNode node=queue.poll();
+                if(node==null){
+                    temp.add(null);
+                    queue.offer(null);
+                    queue.offer(null);
+                }else{
+                    temp.add(node.val);
+                    queue.offer(node.left);
+                    queue.offer(node.right);
+                    flag=true;
+                }
+            }
+        }
+        return result.toString().replace(" ","" );
+
+    }
+    public static TreeNode deserialize(String data) {
+        if(data.length()<=2){
+            return null;
+        }
+        String data2=data.substring(1,data.length()-1);
+        List<String> list=Arrays.asList(data2.split(","));
+        TreeNode root=new TreeNode(Integer.parseInt(list.get(0)));
+        LinkedList<TreeNode> queue=new LinkedList<>();
+        queue.add(root);
+
+        for(int i=1;Math.pow(2,i)<=list.size();i++) {
+            for (int j = (int) (Math.pow(2, i) - 1); j < Math.pow(2, i + 1) - 1; j=j+2) {
+                String left = list.get(j);
+                TreeNode leftNode = String2Node(left);
+                TreeNode rightNode=null;
+                if(j+1<Math.pow(2, i + 1) - 1){
+                    String right = list.get(j + 1);
+                    rightNode= String2Node(right);
+                }
+                TreeNode oldNode = queue.poll();
+                oldNode.left = leftNode;
+                oldNode.right = rightNode;
+                if (leftNode != null) {
+                    queue.offer(leftNode);
+                }
+                if (rightNode != null) {
+                    queue.offer(rightNode);
+                }
+            }
+        }
+        return root;
+    }
+    public static TreeNode String2Node(String s){
+        TreeNode node;
+        if ("null".equals(s)) {
+            node = null;
+        } else {
+            int val = Integer.parseInt(s);
+            node = new TreeNode(val);
+        }
+        return node;
+    }
+    public static void main(String[] args){
+        TreeNode result=deserialize("[1,2,3,null,null,4,5]");
+        System.out.println(serialize(result));
+        TreeNode result2=deserialize(serialize(result));
+        System.out.println(serialize(result2));
     }
 }
 
